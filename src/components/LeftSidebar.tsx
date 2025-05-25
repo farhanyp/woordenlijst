@@ -4,9 +4,11 @@ import React, { memo, useEffect, useState } from 'react';
 import type { BaseComponentProps, SearchExample } from '@/types';
 import { SEARCH_EXAMPLES } from '@/constants';
 
-interface LeftSidebarProps extends BaseComponentProps {}
+interface LeftSidebarProps extends BaseComponentProps {
+  onOpenPopup?: () => void;
+}
 
-const LeftSidebar: React.FC<LeftSidebarProps> = memo(({ className = '' }) => {
+const LeftSidebar: React.FC<LeftSidebarProps> = memo(({ className = '', onOpenPopup }) => {
   return (
     <div className={`bg-white w-[682px] ${className}`}>
       {/* How to search section */}
@@ -16,7 +18,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = memo(({ className = '' }) => {
       <ContentSection />
       
       {/* About section */}
-      <AboutSection />
+      <AboutSection onOpenPopup={onOpenPopup} />
       
       {/* Action buttons */}
       <ActionButtonsSection />
@@ -140,94 +142,44 @@ const ContentList = memo(() => {
 });
 
 // About Section Component
-const AboutSection = memo(() => (
+const AboutSection = memo<{ onOpenPopup?: () => void }>(({ onOpenPopup }) => (
   <section>
     <h2 className="text-2xl font-normal text-primary-500 mb-2">
       Over <span className="font-semibold">Woordenlijst.org</span>
     </h2>
 
     <div className="space-y-6">
-      <OfficialSpellingArticle />
+      <OfficialSpellingArticle onOpenPopup={onOpenPopup} />
       <SpellingRulesArticle />
     </div>
   </section>
 ));
 
+
 // Official Spelling Article Component
-const OfficialSpellingArticle = memo(() => {
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
-  const [popupText, setPopupText] = useState('');
-
-  // Fetch text dari file saat komponen mount
-  useEffect(() => {
-    const fetchText = async () => {
-      try {
-        const response = await fetch('/text.txt');
-        const text = await response.text();
-        setPopupText(text);
-      } catch (error) {
-        console.error('Error loading text file:', error);
-        setPopupText('Maaf, konten tidak dapat dimuat.');
-      }
-    };
-
-    fetchText();
-  }, []);
-
-  const openPopup = () => setIsPopupOpen(true);
-  const closePopup = () => setIsPopupOpen(false);
-
-  return (
-    <>
-      <article className="text-text-primary">
-        <h3 className="text-lg font-semibold mb-4">
-          Officiële{' '}
-          <button 
-            onClick={openPopup}
-            className="text-lg font-semibold hover:opacity-80 transition-opacity duration-200 cursor-pointer"
-          >
-            spelling
-          </button>
-        </h3>
-        <p className="text-base leading-relaxed mb-4">
-          Op Woordenlijst.org vind je de Woordenlijst Nederlandse Taal: de lijst met de officiële spelling van het Nederlands. Het
-          woordenbestand en de applicatie worden ontwikkeld en beheerd door het Instituut voor de Nederlandse Taal (INT) in opdracht van de
-          Taalunie. In Nederland en Vlaanderen is de officiële spelling verplicht voor het onderwijs en de overheid. Het Comité van Ministers van
-          de Taalunie stelt de spelling vast. De{' '}
-          <button className="text-link hover:text-link-hover underline transition-colors duration-200">
-            Commissie Spelling
-          </button>{' '}
-          ondersteunt de Taalunie bij het uitvoeren van deze taak en begeleidt de actualisering van Woordenlijst.org.
-        </p>
-      </article>
-
-      {/* Pop-up Modal */}
-      {isPopupOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-2xl max-h-[80vh] overflow-auto p-6 relative">
-            {/* Close Button */}
-            <button
-              onClick={closePopup}
-              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl font-bold leading-none"
-            >
-              ×
-            </button>
-            
-            {/* Content */}
-            <div className="pr-8">
-              <h4 className="text-xl font-semibold mb-4 text-gray-800">
-                Spelling Informatie
-              </h4>
-              <div className="text-gray-700 whitespace-pre-wrap leading-relaxed">
-                {popupText}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-    </>
-  );
-});
+const OfficialSpellingArticle = memo<{ onOpenPopup?: () => void }>(({ onOpenPopup }) => (
+  <article className="text-text-primary">
+    <h3 className="text-lg font-semibold mb-4">
+      Officiële{' '}
+      <button 
+        onClick={onOpenPopup}
+        className="text-lg font-semibold hover:opacity-80 transition-opacity duration-200 cursor-pointer"
+      >
+        spelling
+      </button>
+    </h3>
+    <p className="text-base leading-relaxed mb-4">
+      Op Woordenlijst.org vind je de Woordenlijst Nederlandse Taal: de lijst met de officiële spelling van het Nederlands. Het
+      woordenbestand en de applicatie worden ontwikkeld en beheerd door het Instituut voor de Nederlandse Taal (INT) in opdracht van de
+      Taalunie. In Nederland en Vlaanderen is de officiële spelling verplicht voor het onderwijs en de overheid. Het Comité van Ministers van
+      de Taalunie stelt de spelling vast. De{' '}
+      <button className="text-link hover:text-link-hover underline transition-colors duration-200">
+        Commissie Spelling
+      </button>{' '}
+      ondersteunt de Taalunie bij het uitvoeren van deze taak en begeleidt de actualisering van Woordenlijst.org.
+    </p>
+  </article>
+));
 
 // Spelling Rules Article Component
 const SpellingRulesArticle = memo(() => (
