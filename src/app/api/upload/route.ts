@@ -1,17 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { v2 as cloudinary } from 'cloudinary';
+import { promises as fs } from 'fs';
+import path from 'path';
 
-// Configure Cloudinary
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
+// Directory untuk menyimpan file di public/uploads
+const UPLOAD_DIR = path.join(process.cwd(), 'public', 'uploads');
 
-// Static filename yang akan selalu digunakan
-const STATIC_FILENAME = 'spelling-info';
-const FOLDER_NAME = 'text-files';
-const FULL_PUBLIC_ID = `${FOLDER_NAME}/${STATIC_FILENAME}`;
+// Pastikan directory upload exists
+async function ensureUploadDir() {
+  try {
+    await fs.access(UPLOAD_DIR);
+  } catch {
+    await fs.mkdir(UPLOAD_DIR, { recursive: true });
+  }
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -25,15 +26,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if file is a text file
-    if (!file.type.includes('text') && !file.name.endsWith('.txt')) {
+    // Validasi file type - hanya .txt yang diperbolehkan
+    if (!file.name.endsWith('.txt') && file.type !== 'text/plain') {
       return NextResponse.json(
-        { error: 'Only text files are allowed' },
+        { error: 'Only .txt files are allowed' },
         { status: 400 }
       );
     }
 
-    // Check file size (limit to 1MB for text files)
+    // Validasi ukuran file (maksimum 1MB)
     if (file.size > 1024 * 1024) {
       return NextResponse.json(
         { error: 'File size too large. Maximum 1MB allowed.' },
@@ -41,55 +42,80 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if file already exists and delete it
+    // Pastikan upload directory exists
+    await ensureUploadDir();
+
+    // Baca content file
+    const fileContent = await file.text();
+
+    // Path file dengan nama statik "upload.txt"
+    const staticFilePath = path.join(UPLOAD_DIR, 'upload.txt');
+
+    // Cek apakah file sudah ada
+    let fileExists = false;
     try {
-      await cloudinary.api.resource(FULL_PUBLIC_ID, { resource_type: 'raw' });
-      // File exists, delete it first
-      console.log('Existing file found, deleting...');
-      await cloudinary.uploader.destroy(FULL_PUBLIC_ID, { resource_type: 'raw' });
-      console.log('Old file deleted successfully');
-    } catch (error: any) {
-      if (error.http_code === 404) {
-        console.log('No existing file found, proceeding with upload...');
-      } else {
-        console.error('Error checking/deleting existing file:', error);
-        // Continue with upload even if delete fails
-      }
+      await fs.access(staticFilePath);
+      fileExists = true;
+    } catch {
+      fileExists = false;
     }
 
-    // Convert file to buffer
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
+    // Simpan atau replace file dengan nama "upload.txt"
+    await fs.writeFile(staticFilePath, fileContent, 'utf-8');
 
-    // Upload new file with static filename
-    const result = await new Promise((resolve, reject) => {
-      cloudinary.uploader.upload_stream(
-        {
-          resource_type: 'raw',
-          folder: FOLDER_NAME,
-          public_id: STATIC_FILENAME,
-          use_filename: false, // Don't use original filename
-          unique_filename: false, // Don't add unique suffix
-          overwrite: true, // Allow overwrite (as backup)
-        },
-        (error, result) => {
-          if (error) reject(error);
-          else resolve(result);
-        }
-      ).end(buffer);
-    });
+    const message = fileExists 
+      ? 'File upload.txt has been successfully replaced'
+      : 'File upload.txt has been successfully uploaded';
 
     return NextResponse.json({
-      message: 'File uploaded successfully',
-      url: (result as any).secure_url,
-      publicId: (result as any).public_id,
-      filename: STATIC_FILENAME,
+      message,
+      url: '/uploads/upload.txt', // URL untuk akses publik
+      publicId: 'upload',
+      filename: 'upload',
+      fileSize: file.size,
+      replaced: fileExists,
+      content: fileContent.substring(0, 100) + (fileContent.length > 100 ? '...' : '')
     });
 
   } catch (error) {
     console.error('Upload error:', error);
     return NextResponse.json(
       { error: 'Failed to upload file' },
+      { status: 500 }
+    );
+  }
+}
+
+// GET method untuk cek apakah file upload.txt ada
+export async function GET() {
+  try {
+    await ensureUploadDir();
+    
+    const filePath = path.join(UPLOAD_DIR, 'upload.txt');
+    
+    try {
+      const stats = await fs.stat(filePath);
+      const content = await fs.readFile(filePath, 'utf-8');
+      
+      return NextResponse.json({
+        exists: true,
+        name: 'upload.txt',
+        size: stats.size,
+        lastModified: stats.mtime,
+        url: '/uploads/upload.txt',
+        preview: content.substring(0, 100) + (content.length > 100 ? '...' : '')
+      });
+    } catch {
+      return NextResponse.json({
+        exists: false,
+        message: 'File upload.txt does not exist yet'
+      });
+    }
+
+  } catch (error) {
+    console.error('Error checking file:', error);
+    return NextResponse.json(
+      { error: 'Failed to check file' },
       { status: 500 }
     );
   }

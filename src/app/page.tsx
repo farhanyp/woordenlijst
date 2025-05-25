@@ -13,6 +13,8 @@ interface TextResponse {
   url: string;
   publicId: string;
   filename: string;
+  size: number;
+  lastModified: string;
 }
 
 interface TextError {
@@ -27,13 +29,15 @@ const HomePage: NextPage = () => {
     url: string;
     filename: string;
     exists: boolean;
+    size?: number;
+    lastModified?: string;
   }>({
     url: '',
     filename: '',
     exists: false
   });
 
-  // Fetch text from Cloudinary using static filename
+  // Fetch text from local uploads directory
   useEffect(() => {
     const fetchText = async () => {
       setIsLoading(true);
@@ -59,11 +63,13 @@ const HomePage: NextPage = () => {
         setFileInfo({
           url: data.url,
           filename: data.filename,
-          exists: true
+          exists: true,
+          size: data.size,
+          lastModified: data.lastModified
         });
       } catch (error) {
-        console.error('Error loading text file from Cloudinary:', error);
-        setPopupText('Sorry, content cannot be loaded from Cloudinary. Please try again later.');
+        console.error('Error loading text file:', error);
+        setPopupText('Sorry, content cannot be loaded. Please try again later.');
         setFileInfo(prev => ({ ...prev, exists: false }));
       } finally {
         setIsLoading(false);
@@ -85,8 +91,14 @@ const HomePage: NextPage = () => {
         setFileInfo({
           url: data.url,
           filename: data.filename,
-          exists: true
+          exists: true,
+          size: data.size,
+          lastModified: data.lastModified
         });
+      } else {
+        // If file doesn't exist after refresh
+        setPopupText('No file has been uploaded yet.');
+        setFileInfo(prev => ({ ...prev, exists: false }));
       }
     } catch (error) {
       console.error('Error refreshing content:', error);
@@ -127,39 +139,31 @@ const HomePage: NextPage = () => {
 
       <Footer/>
 
-      {/* Pop-up Modal */}
+      {/* Pop-up Modal - Mobile Responsive */}
       {isPopupOpen && (
         <div 
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4"
-          style={{ 
-            zIndex: 99999,
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0
-          }}
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-[99999]"
           onClick={closePopup}
         >
           <div 
-            className="bg-white rounded-lg max-w-2xl max-h-[80vh] overflow-auto p-6 relative shadow-2xl"
+            className="bg-white rounded-lg w-full max-w-2xl max-h-[90vh] overflow-auto p-4 sm:p-6 relative shadow-2xl mx-4"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Close Button */}
             <button
               onClick={closePopup}
-              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl font-bold leading-none w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100"
+              className="absolute top-3 right-3 sm:top-4 sm:right-4 text-gray-500 hover:text-gray-700 text-2xl font-bold leading-none w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 z-10"
             >
               ×
             </button>
             
             {/* Content */}
-            <div className="pr-8">
-              <div className="flex items-center justify-between mb-4">
+            <div className="pr-8 sm:pr-10">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2">
                 <h4 className="text-xl font-semibold text-gray-800">
                   Spelling Information
                 </h4>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
                   {fileInfo.exists && fileInfo.url && (
                     <a 
                       href={fileInfo.url}
@@ -183,10 +187,10 @@ const HomePage: NextPage = () => {
               {isLoading ? (
                 <div className="flex items-center justify-center py-8">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                  <span className="ml-3 text-gray-600">Loading from Cloudinary...</span>
+                  <span className="ml-3 text-gray-600">Loading from server...</span>
                 </div>
               ) : (
-                <div className="text-gray-700 whitespace-pre-wrap leading-relaxed">
+                <div className="text-gray-700 whitespace-pre-wrap leading-relaxed text-sm sm:text-base">
                   {popupText}
                 </div>
               )}
@@ -194,9 +198,27 @@ const HomePage: NextPage = () => {
               {/* File Info */}
               {fileInfo.exists && (
                 <div className="mt-4 pt-4 border-t border-gray-200">
-                  <p className="text-xs text-gray-500">
-                    File: {fileInfo.filename}.txt
-                  </p>
+                  <div className="text-xs text-gray-500 space-y-1">
+                    <p>File: {fileInfo.filename}.txt</p>
+                    {fileInfo.size && (
+                      <p>Size: {(fileInfo.size / 1024).toFixed(1)} KB</p>
+                    )}
+                    {fileInfo.lastModified && (
+                      <p>Last modified: {new Date(fileInfo.lastModified).toLocaleString('en-US')}</p>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Upload Link */}
+              {!fileInfo.exists && (
+                <div className="mt-4 pt-4 border-t border-gray-200">
+                  <a 
+                    href="/upload"
+                    className="text-button-primary hover:text-button-secondary font-medium"
+                  >
+                    → Go to upload page
+                  </a>
                 </div>
               )}
             </div>

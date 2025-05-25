@@ -1,60 +1,40 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { v2 as cloudinary } from 'cloudinary';
+import { NextResponse } from 'next/server';
+import { promises as fs } from 'fs';
+import path from 'path';
 
-// Configure Cloudinary
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
+const UPLOAD_DIR = path.join(process.cwd(), 'public', 'uploads');
 
-// Static filename yang sama dengan upload
-const STATIC_FILENAME = 'spelling-info';
-const FOLDER_NAME = 'text-files';
-const FULL_PUBLIC_ID = `${FOLDER_NAME}/${STATIC_FILENAME}`;
-
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
-    let textFileUrl = '';
-
+    const filePath = path.join(UPLOAD_DIR, 'upload.txt');
+    
+    // Cek apakah file exists
     try {
-      // Check if static file exists
-      const resource = await cloudinary.api.resource(FULL_PUBLIC_ID, { 
-        resource_type: 'raw' 
-      });
-      
-      textFileUrl = resource.secure_url;
-      console.log('Static file found:', textFileUrl);
-    } catch (error: any) {
-      if (error.http_code === 404) {
-        return NextResponse.json(
-          { error: 'Text file not found. Please upload a file first.' },
-          { status: 404 }
-        );
-      } else {
-        throw error;
-      }
+      await fs.access(filePath);
+    } catch {
+      return NextResponse.json(
+        { error: 'File not found' },
+        { status: 404 }
+      );
     }
 
-    // Fetch content dari Cloudinary
-    const response = await fetch(textFileUrl);
-    if (!response.ok) {
-      throw new Error(`Failed to fetch file: ${response.status}`);
-    }
-
-    const textContent = await response.text();
+    // Baca content file
+    const content = await fs.readFile(filePath, 'utf-8');
+    const stats = await fs.stat(filePath);
 
     return NextResponse.json({
-      content: textContent,
-      url: textFileUrl,
-      publicId: FULL_PUBLIC_ID,
-      filename: STATIC_FILENAME
+      content,
+      url: '/uploads/upload.txt',
+      publicId: 'upload',
+      filename: 'upload',
+      size: stats.size,
+      lastModified: stats.mtime
     });
 
   } catch (error) {
-    console.error('Error fetching text file:', error);
+    console.error('Error reading file:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch text file' },
+      { error: 'Failed to read file' },
       { status: 500 }
     );
   }

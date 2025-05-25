@@ -9,18 +9,6 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@editorjs/code": "^2.9.3",
-    "@editorjs/delimiter": "^1.4.2",
-    "@editorjs/editorjs": "^2.30.8",
-    "@editorjs/embed": "^2.7.6",
-    "@editorjs/header": "^2.8.8",
-    "@editorjs/link": "^2.6.2",
-    "@editorjs/list": "^2.0.8",
-    "@editorjs/marker": "^1.4.0",
-    "@editorjs/paragraph": "^2.11.7",
-    "@editorjs/quote": "^2.7.6",
-    "@tinymce/tinymce-react": "^6.1.0",
-    "cloudinary": "^2.6.1",
     "lucide-react": "^0.511.0",
     "multer": "^2.0.0",
     "next": "15.1.8",
