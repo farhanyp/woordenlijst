@@ -33,7 +33,7 @@ const HomePage: NextPage = () => {
     exists: false
   });
 
-  // Fetch text dari Cloudinary menggunakan static filename
+  // Fetch text from Cloudinary using static filename
   useEffect(() => {
     const fetchText = async () => {
       setIsLoading(true);
@@ -42,7 +42,7 @@ const HomePage: NextPage = () => {
         
         if (!response.ok) {
           if (response.status === 404) {
-            setPopupText('Belum ada file yang diupload. Silakan upload file terlebih dahulu melalui halaman upload.');
+            setPopupText('No file has been uploaded yet. Please upload a file first through the upload page.');
             setFileInfo(prev => ({ ...prev, exists: false }));
             return;
           }
@@ -63,7 +63,7 @@ const HomePage: NextPage = () => {
         });
       } catch (error) {
         console.error('Error loading text file from Cloudinary:', error);
-        setPopupText('Maaf, konten tidak dapat dimuat dari Cloudinary. Silakan coba lagi nanti.');
+        setPopupText('Sorry, content cannot be loaded from Cloudinary. Please try again later.');
         setFileInfo(prev => ({ ...prev, exists: false }));
       } finally {
         setIsLoading(false);
@@ -157,7 +157,7 @@ const HomePage: NextPage = () => {
             <div className="pr-8">
               <div className="flex items-center justify-between mb-4">
                 <h4 className="text-xl font-semibold text-gray-800">
-                  Spelling Informatie
+                  Spelling Information
                 </h4>
                 <div className="flex gap-2">
                   {fileInfo.exists && fileInfo.url && (
@@ -167,7 +167,7 @@ const HomePage: NextPage = () => {
                       rel="noopener noreferrer"
                       className="text-sm text-blue-600 hover:text-blue-700"
                     >
-                      Lihat File Asli
+                      View Original File
                     </a>
                   )}
                   <button
@@ -183,7 +183,7 @@ const HomePage: NextPage = () => {
               {isLoading ? (
                 <div className="flex items-center justify-center py-8">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                  <span className="ml-3 text-gray-600">Loading dari Cloudinary...</span>
+                  <span className="ml-3 text-gray-600">Loading from Cloudinary...</span>
                 </div>
               ) : (
                 <div className="text-gray-700 whitespace-pre-wrap leading-relaxed">

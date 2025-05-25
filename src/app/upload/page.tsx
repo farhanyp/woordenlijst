@@ -29,13 +29,13 @@ const UploadPage = () => {
       
       // Validate file type
       if (!selectedFile.type.includes('text') && !selectedFile.name.endsWith('.txt')) {
-        setError('Hanya file text (.txt) yang diperbolehkan');
+        setError('Only text files (.txt) are allowed');
         return;
       }
 
       // Validate file size (1MB limit)
       if (selectedFile.size > 1024 * 1024) {
-        setError('Ukuran file terlalu besar. Maksimal 1MB.');
+        setError('File size too large. Maximum 1MB allowed.');
         return;
       }
 
@@ -61,13 +61,13 @@ const UploadPage = () => {
       const data: UploadResponse | UploadError = await response.json();
 
       if (!response.ok) {
-        throw new Error((data as UploadError).error || 'Upload gagal');
+        throw new Error((data as UploadError).error || 'Upload failed');
       }
 
       setUploadResult(data as UploadResponse);
       setFile(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Terjadi kesalahan');
+      setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setUploading(false);
     }
@@ -90,7 +90,7 @@ const UploadPage = () => {
               href="/"
               className="text-blue-600 hover:text-blue-700 font-medium transition-colors"
             >
-              ← Kembali ke Beranda
+              ← Back to Home
             </Link>
           </div>
         </div>
@@ -149,7 +149,7 @@ const UploadArea = memo<{
 }>(({ file, onFileSelect, error }) => (
   <div className="mb-6">
     <label className="block text-sm font-medium text-gray-700 mb-2">
-      Pilih File Text (.txt)
+      Select Text File (.txt)
     </label>
     
     <div className={`
@@ -177,10 +177,10 @@ const UploadArea = memo<{
           <div className="space-y-2">
             <Upload className="w-12 h-12 text-gray-400 mx-auto" />
             <p className="text-sm font-medium text-gray-900">
-              Klik untuk memilih file
+              Click to select file
             </p>
             <p className="text-xs text-gray-500">
-              atau drag and drop file di sini
+              or drag and drop file here
             </p>
           </div>
         )}
@@ -201,7 +201,7 @@ const ActionButtons = memo<{
       disabled={uploading}
       className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
     >
-      {uploading ? 'Mengupload...' : 'Upload File'}
+      {uploading ? 'Uploading...' : 'Upload File'}
     </button>
     
     <button
@@ -223,10 +223,10 @@ const UploadSuccess = memo<{
     <div className="flex items-start">
       <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 mr-3 flex-shrink-0" />
       <div className="flex-1">
-        <h3 className="text-green-800 font-medium mb-2">Upload Berhasil!</h3>
+        <h3 className="text-green-800 font-medium mb-2">Upload Successful!</h3>
         
         <div className="bg-white rounded border p-3 mb-3">
-          <p className="text-xs text-gray-600 mb-1">URL File:</p>
+          <p className="text-xs text-gray-600 mb-1">File URL:</p>
           <a 
             href={result.url}
             target="_blank"
@@ -242,14 +242,14 @@ const UploadSuccess = memo<{
             onClick={onReset}
             className="text-green-700 hover:text-green-800 text-sm font-medium"
           >
-            Upload File Baru
+            Upload New File
           </button>
           <span className="text-gray-400">|</span>
           <Link
             href="/"
             className="text-blue-600 hover:text-blue-700 text-sm font-medium"
           >
-            Lihat di Homepage
+            View on Homepage
           </Link>
         </div>
       </div>
@@ -281,12 +281,12 @@ const ErrorMessage = memo<{
 // Info Section Component
 const InfoSection = memo(() => (
   <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
-    <h2 className="text-lg font-medium text-blue-900 mb-3">Informasi Upload</h2>
+    <h2 className="text-lg font-medium text-blue-900 mb-3">Upload Information</h2>
     <ul className="text-blue-800 text-sm space-y-1">
-      <li>• Hanya file text (.txt) yang diperbolehkan</li>
-      <li>• Maksimal ukuran file: 1MB</li>
-      <li>• File akan disimpan dengan aman di Cloudinary</li>
-      <li>• URL file dapat diakses secara publik</li>
+      <li>• Only text files (.txt) are allowed</li>
+      <li>• Maximum file size: 1MB</li>
+      <li>• Files will be stored securely on Cloudinary</li>
+      <li>• File URL can be accessed publicly</li>
     </ul>
   </div>
 ));
