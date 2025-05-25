@@ -18,9 +18,9 @@ const MainContent: React.FC<MainContentProps> = ({
     <div className={`min-h-screen bg-white ${className}`}>
       <div className="w-full py-8">
         {/* Layout Sidebar */}
-        <div className="flex flex-col lg:flex-row justify-between lg:px-3 items-start lg:mx-[100px]">
+        <div className="flex flex-col lg:flex-row lg:px-3 items-start lg:mx-[100px] gap-6">
           {leftSidebar && (
-            <aside className="w-full lg:w-auto lg:p-[10px]">
+            <aside className="w-full lg:w-[80%] lg:p-[10px]">
               <div className="sticky top-24">
                 {leftSidebar}
               </div>
@@ -28,8 +28,8 @@ const MainContent: React.FC<MainContentProps> = ({
           )}
 
           {rightSidebar && (
-            <aside className="w-full lg:w-auto lg:max-w-[40%] mt-8 lg:mt-0">
-              <div className="sticky top-24 lg:ml-4">
+            <aside className="w-full lg:w-[20%] mt-8 lg:mt-0">
+              <div className="sticky top-24">
                 {rightSidebar}
               </div>
             </aside>

@@ -28,8 +28,8 @@ const LeftSidebar: React.FC<LeftSidebarProps> = memo(({ className = '', onOpenPo
 
 // Search Guide Section Component
 const SearchGuideSection = memo(() => (
-  <section className="mb-4">
-    <h1 className="text-2xl lg:text-3xl font-normal text-primary-500 mb-6">
+  <section className="mt-5">
+    <h1 className="text-2xl lg:text-3xl font-normal text-primary-500 mb-2">
       <span>Hoe zoek ik op </span>
       <span className="font-semibold">Woordenlijst.org</span>
       <span>?</span>
@@ -37,7 +37,7 @@ const SearchGuideSection = memo(() => (
 
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-normal text-secondary-500 mb-4">
+        <h2 className="text-2xl font-medium capitalize text-secondary-500 mb-4">
           Jokers gebruiken
         </h2>
         
