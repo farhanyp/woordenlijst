@@ -12,6 +12,10 @@ export default {
         background: "var(--background)",
         foreground: "var(--foreground)",
       },
+      fontFamily: {
+        'primary': ['schoolboek', 'Helvetica', 'Arial', 'Open Sans', 'Verdana', 'sans-serif'],
+        'sans': ['schoolboek', 'Helvetica', 'Arial', 'Open Sans', 'Verdana', 'sans-serif'],
+      },
     },
   },
   plugins: [],
