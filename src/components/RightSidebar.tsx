@@ -1,10 +1,10 @@
 'use client';
 
 import { memo } from 'react';
+import type { BaseComponentProps, StatisticsData } from '@/types';
+import { STATISTICS_DATA } from '@/constants';
 
-interface RightSidebarProps {
-  className?: string;
-}
+interface RightSidebarProps extends BaseComponentProps {}
 
 // Custom rounded card component
 const CustomCard = memo<{
@@ -14,14 +14,12 @@ const CustomCard = memo<{
 }>(({ children, variant = 'default', className = '' }) => {
   const baseClasses = "rounded-tr-[75px] rounded-tl-[75px] rounded-br-[75px] transition-all duration-200";
   const variantClasses = variant === 'gradient' 
-    ? "bg-gradient-to-br from-[#2B7A78] to-[#17A2B8] text-white hover:from-[#2B7A78]/90 hover:to-[#17A2B8]/90 border-[0.8px] border-[rgb(33,37,41)] p-[16px]" 
-    : "bg-white border-[0.8px] border-[rgb(33,37,41)] hover:border-[rgb(33,37,41)] p-[16px]";
+    ? "bg-gradient-to-br from-accent-500 to-info-500 text-white hover:from-accent-500/90 hover:to-info-500/90 border-[0.8px] border-text-primary p-[16px]" 
+    : "bg-white border-[0.8px] border-text-primary hover:border-text-primary p-[16px]";
 
   return (
     <div className={`${baseClasses} ${variantClasses} ${className}`}>
-      <div>
-        {children}
-      </div>
+      <div>{children}</div>
     </div>
   );
 });
@@ -43,16 +41,10 @@ const StatCard = memo<{
   return (
     <CustomCard>
       <div className="text-center py-12">
-        <div 
-          className={`${sizeClasses[valueSize]} font-semibold mb-4`}
-          style={{ color: 'rgb(24, 43, 73)' }}
-        >
+        <div className={`${sizeClasses[valueSize]} font-semibold mb-4 text-button-primary`}>
           {value}
         </div>
-        <div 
-          className="text-xs font-light"
-          style={{ color: 'rgb(24, 43, 73)' }}
-        >
+        <div className="text-xs font-light text-button-primary">
           {label}
         </div>
       </div>
@@ -63,20 +55,6 @@ const StatCard = memo<{
 StatCard.displayName = 'StatCard';
 
 const RightSidebar: React.FC<RightSidebarProps> = memo(({ className = '' }) => {
-  // Data configuration untuk mudah maintenance
-  const statisticsData = [
-    {
-      id: 'trefwoorden',
-      value: '229.862',
-      label: 'AANTAL TREFWOORDEN'
-    },
-    {
-      id: 'woordvormen', 
-      value: '848.203',
-      label: 'AANTAL TREFWOORDEN'
-    }
-  ];
-
   const lastUpdateData = {
     value: '20 februari 2025',
     label: 'Laatste update',
@@ -87,7 +65,7 @@ const RightSidebar: React.FC<RightSidebarProps> = memo(({ className = '' }) => {
     <div className={`w-full px-2.5 space-y-4 ${className}`}>
       {/* Statistics Cards Container */}
       <div className="space-y-4">
-        {statisticsData.map((stat) => (
+        {STATISTICS_DATA.map((stat) => (
           <StatCard
             key={stat.id}
             value={stat.value}
@@ -96,7 +74,7 @@ const RightSidebar: React.FC<RightSidebarProps> = memo(({ className = '' }) => {
         ))}
       </div>
 
-      {/* Laatste Update Card */}
+      {/* Last Update Card */}
       <StatCard
         value={lastUpdateData.value}
         label={lastUpdateData.label}

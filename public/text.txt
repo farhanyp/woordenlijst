@@ -1,0 +1,8 @@
+Dit is de inhoud die wordt weergegeven in de pop-up.
+
+U kunt hier alle inhoud schrijven, waaronder:
+- Informatie over spelling
+- Specifieke regels
+- Aanvullende uitleg
+
+Dit bestand kan lange tekst bevatten en wordt weergegeven in de pop-up wanneer de gebruiker op het woord "spelling" klikt.

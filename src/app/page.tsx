@@ -5,24 +5,24 @@ import Navbar from '@/components/Navbar';
 import LeftSidebar from '@/components/LeftSidebar';
 import RightSidebar from '@/components/RightSidebar';
 import MainContent from '@/components/MainContent';
-import BottomSidebar from '@/components/BottomSidebar';
+import Footer from '@/components/Footer';
 
 const HomePage: NextPage = () => {
   return (
     <div className="min-h-screen bg-white">
-      {/* Navbar dengan Hero Section terintegrasi */}
       <Navbar 
         showHero={true}
-        heroTitle="Welkom bij Woordenlijst"
+        heroTitle="Zoek een woord"
         heroSubtitle="Spellingregels en taaladvies voor het Nederlands"
         scrollThreshold={1}
       />
 
-      {/* Layout dengan Sidebar dan Main Content */}
       <MainContent
         leftSidebar={<LeftSidebar />}
         rightSidebar={<RightSidebar />}
       />
+
+      <Footer/>
     </div>
   );
 };

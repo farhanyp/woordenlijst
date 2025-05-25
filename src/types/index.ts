@@ -1,4 +1,5 @@
 import { LucideIcon } from 'lucide-react';
+import { ReactNode } from 'react';
 
 export interface MenuItem {
   id: string;
@@ -21,5 +22,40 @@ export interface NavbarProps {
   logoAlt?: string;
   menuItems?: MenuItem[];
   scrollThreshold: number;
-  hysteresisOffset?: number
+  hysteresisOffset?: number;
+}
+
+export interface ExtendedNavbarProps extends NavbarProps {
+  showHero?: boolean;
+  heroTitle?: string;
+  heroSubtitle?: string;
+}
+
+export interface StatisticsData {
+  id: string;
+  value: string;
+  label: string;
+}
+
+export interface SearchExample {
+  search: string;
+  result: string;
+}
+
+export interface FloatingChar {
+  id: number;
+  char: string;
+  x: number;
+  y: number;
+  size: number;
+  duration: number;
+  delay: number;
+  direction: 'normal' | 'reverse' | 'alternate';
+  path: 'float' | 'spiral' | 'wave' | 'bounce';
+  fontWeight: string;
+}
+
+export interface BaseComponentProps {
+  className?: string;
+  children?: ReactNode;
 }
